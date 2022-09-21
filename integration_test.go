@@ -1,28 +1,28 @@
 package Steam2Go
 
 import (
-	"SteamGo/WebAPI"
 	"context"
+	Steam2Go "github.com/Svarrogh1337/Steam2Go/WebAPI"
 	"log"
 	"testing"
 	"time"
 )
 
-var options = &SteamGo.GetISteamNewsOptions{
+var options = &Steam2Go.GetISteamNewsOptions{
 	5,
 	time.Now().Unix(),
 	5,
 	"patchnotes",
 }
 
-var options2 = &SteamGo.GetISteamNewsOptions{
+var options2 = &Steam2Go.GetISteamNewsOptions{
 	Count:   5,
 	Enddate: time.Now().Unix(),
 }
 
 func TestApiClient(t *testing.T) {
 	ctx := context.Background()
-	c := SteamGo.ApiClient("")
+	c := Steam2Go.ApiClient("")
 	data, _ := c.GetISteamNews(ctx, 730, nil)
 	log.Println(data.Appnews.Newsitems[5].Title)
 	data2, _ := c.GetISteamNews(ctx, 440, options)
