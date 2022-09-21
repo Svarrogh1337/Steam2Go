@@ -38,7 +38,7 @@ type GetAppNewsOptions struct {
 	Tags      string `json:"tags,omitempty"`
 }
 
-func (c *Client) GetISteamNews(appId int, options *GetAppNewsOptions) (*GetAppNewsResponse, error) {
+func (c *Client) GetAppNews(appId int, options *GetAppNewsOptions) (*GetAppNewsResponse, error) {
 	var fullResponse GetAppNewsResponse
 	maxlength := 20
 	enddate := time.Now().Unix()
