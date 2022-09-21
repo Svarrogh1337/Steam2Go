@@ -21,11 +21,11 @@ var options2 = &Steam2Go.GetAppNewsOptions{
 
 func TestApiClient(t *testing.T) {
 	c := Steam2Go.ApiClient("", 1)
-	data, _ := c.GetISteamNews(730, nil)
+	data, _ := c.GetAppNews(730, nil)
 	log.Println(data.Appnews.Newsitems[5].Title)
-	data2, _ := c.GetISteamNews(440, options)
+	data2, _ := c.GetAppNews(440, options)
 	log.Println(data2.Appnews.Newsitems[1].Title)
-	data3, _ := c.GetISteamNews(440, options2)
+	data3, _ := c.GetAppNews(440, options2)
 	if len(data3.Appnews.Newsitems) == options2.Count {
 		log.Println("pass")
 	}
