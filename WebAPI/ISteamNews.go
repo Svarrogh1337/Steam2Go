@@ -56,23 +56,16 @@ func (c *Client) GetAppNews(appId int, options *GetAppNewsOptions) (*GetAppNewsR
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Accept", "application/json")
 	res, err := c.HTTPClient.Do(req)
-
 	if err != nil {
 		return nil, err
 	}
-
 	defer res.Body.Close()
-
 	if res.StatusCode < http.StatusOK || res.StatusCode >= http.StatusBadRequest {
 		return nil, err
 	}
-
 	if err := json.NewDecoder(res.Body).Decode(&fullResponse); err != nil {
 		return nil, err
 	}
-
 	return &fullResponse, err
 }
