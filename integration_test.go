@@ -1,7 +1,6 @@
 package Steam2Go
 
 import (
-	"context"
 	Steam2Go "github.com/Svarrogh1337/Steam2Go/WebAPI"
 	"log"
 	"testing"
@@ -21,14 +20,12 @@ var options2 = &Steam2Go.GetAppNewsOptions{
 }
 
 func TestApiClient(t *testing.T) {
-	ctx := context.Background()
-	c := Steam2Go.ApiClient("", 2)
-	data, _ := c.GetAppNews(ctx, 730, nil)
-	log.Println(data)
-	log.Println(data.Appnews.Newsitems[0].Title)
-	data2, _ := c.GetAppNews(ctx, 440, options)
+	c := Steam2Go.ApiClient("", 1)
+	data, _ := c.GetISteamNews(730, nil)
+	log.Println(data.Appnews.Newsitems[5].Title)
+	data2, _ := c.GetISteamNews(440, options)
 	log.Println(data2.Appnews.Newsitems[1].Title)
-	data3, _ := c.GetAppNews(ctx, 440, options2)
+	data3, _ := c.GetISteamNews(440, options2)
 	if len(data3.Appnews.Newsitems) == options2.Count {
 		log.Println("pass")
 	}
