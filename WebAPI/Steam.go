@@ -1,4 +1,4 @@
-package SteamGo
+package Steam2Go
 
 import (
 	"net/http"
