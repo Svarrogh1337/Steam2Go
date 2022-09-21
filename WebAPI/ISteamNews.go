@@ -1,7 +1,7 @@
 package Steam2Go
 
 import (
-	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
@@ -38,7 +38,8 @@ type GetAppNewsOptions struct {
 	Tags      string `json:"tags,omitempty"`
 }
 
-func (c *Client) GetAppNews(ctx context.Context, appId int, options *GetAppNewsOptions) (*AppNews, error) {
+func (c *Client) GetISteamNews(appId int, options *GetAppNewsOptions) (*GetAppNewsResponse, error) {
+	var fullResponse GetAppNewsResponse
 	maxlength := 20
 	enddate := time.Now().Unix()
 	count := 20
@@ -50,14 +51,28 @@ func (c *Client) GetAppNews(ctx context.Context, appId int, options *GetAppNewsO
 		tags = options.Tags
 	}
 	req, err := http.NewRequest("GET",
-		fmt.Sprintf("%s/ISteamNews/GetNewsForApp/v%d?appid=%d&maxlength=%d&enddate=%d&count=%d&tags=%s",
-			c.BaseURL, c.ApiVersion, appId, maxlength, enddate, count, tags), nil)
+		fmt.Sprintf("%s/ISteamNews/GetNewsForApp/v2?appid=%d&maxlength=%d&enddate=%d&count=%d&tags=%s",
+			c.BaseURL, appId, maxlength, enddate, count, tags), nil)
 	if err != nil {
 		return nil, err
 	}
-	res := AppNews{}
-	if err := c.sendRequest(ctx, req, &res); err != nil {
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+	res, err := c.HTTPClient.Do(req)
+
+	if err != nil {
 		return nil, err
 	}
-	return &res, nil
+
+	defer res.Body.Close()
+
+	if res.StatusCode < http.StatusOK || res.StatusCode >= http.StatusBadRequest {
+		return nil, err
+	}
+
+	if err := json.NewDecoder(res.Body).Decode(&fullResponse); err != nil {
+		return nil, err
+	}
+
+	return &fullResponse, err
 }
