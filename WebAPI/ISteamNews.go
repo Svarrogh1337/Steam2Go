@@ -8,15 +8,17 @@ import (
 	"time"
 )
 
-func (c *Client) GetAppNewsV2(appId int, options *GetAppNewsOptions) (*GetAppNewsResponseV2, error) {
+func (c *Client) GetAppNewsV1(appId int, options *GetAppNewsOptions) (*GetAppNewsResponseV1, error) {
 	const (
-		apiVersion = 2
+		apiVersion = 1
 	)
-	resp := GetAppNewsResponseV2{}
+
+	resp := GetAppNewsResponseV1{}
 	maxlength := 20
 	enddate := time.Now().Unix()
 	count := 20
 	tags := ""
+
 	if options != nil {
 		maxlength = options.Maxlength
 		enddate = options.Enddate
@@ -26,6 +28,7 @@ func (c *Client) GetAppNewsV2(appId int, options *GetAppNewsOptions) (*GetAppNew
 	req, err := http.NewRequest("GET",
 		fmt.Sprintf("%s/ISteamNews/GetNewsForApp/v%d?appid=%d&maxlength=%d&enddate=%d&count=%d&tags=%s",
 			c.BaseURL, apiVersion, appId, maxlength, enddate, count, tags), nil)
+
 	if err != nil {
 		return nil, err
 	}
@@ -39,11 +42,11 @@ func (c *Client) GetAppNewsV2(appId int, options *GetAppNewsOptions) (*GetAppNew
 	return &resp, err
 }
 
-func (c *Client) GetAppNewsV1(appId int, options *GetAppNewsOptions) (*GetAppNewsResponseV1, error) {
+func (c *Client) GetAppNewsV2(appId int, options *GetAppNewsOptions) (*GetAppNewsResponseV2, error) {
 	const (
-		apiVersion = 1
+		apiVersion = 2
 	)
-	resp := GetAppNewsResponseV1{}
+	resp := GetAppNewsResponseV2{}
 	maxlength := 20
 	enddate := time.Now().Unix()
 	count := 20

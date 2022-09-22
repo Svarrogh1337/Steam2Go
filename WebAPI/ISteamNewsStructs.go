@@ -54,8 +54,8 @@ type NewsItemsV2 struct {
 }
 
 type GetAppNewsOptions struct {
-	Maxlength int    `json:"Maxlength"`
-	Enddate   int64  `json:"Enddate"`
+	Maxlength int    `json:"maxlength"`
+	Enddate   int64  `json:"enddate"`
 	Count     int    `json:"count"`
 	Tags      string `json:"tags,omitempty"`
 }
