@@ -21,12 +21,15 @@ var options2 = &Steam2Go.GetAppNewsOptions{
 
 func TestApiClient(t *testing.T) {
 	c := Steam2Go.ApiClient("")
-	data, err := c.GetAppNewsV2(730, options)
-	data2, err2 := c.GetAppNewsV1(730, options2)
-	assert.NotNil(t, data)
-	assert.NotNil(t, data2)
+	newsV2, err := c.GetAppNewsV2(730, options)
+	newsV1, err2 := c.GetAppNewsV1(730, options2)
+	appsv1, err3 := c.GetAppListV1()
+	assert.NotNil(t, newsV1)
+	assert.NotNil(t, newsV2)
+	assert.NotNil(t, appsv1.Applist.Apps.App[0].Appid)
 	assert.Nil(t, err)
 	assert.Nil(t, err2)
-	assert.Equal(t, 730, data.Appnews.Newsitems[1].Appid)
-	assert.Equal(t, 730, data2.Appnews.Newsitems.Newsitem[1].Appid)
+	assert.Nil(t, err3)
+	assert.Equal(t, 730, newsV2.Appnews.Newsitems[0].Appid)
+	assert.Equal(t, 730, newsV1.Appnews.Newsitems.Newsitem[0].Appid)
 }
