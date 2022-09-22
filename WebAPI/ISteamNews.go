@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"time"
 )
@@ -32,7 +31,6 @@ func (c *Client) GetAppNewsV2(appId int, options *GetAppNewsOptions) (*GetAppNew
 	}
 	res, err := c.sendRequest(req)
 	if err = json.NewDecoder(res.Body).Decode(&resp); err != nil {
-		log.Println(err)
 		return nil, err
 	}
 	defer func(Body io.ReadCloser) {
@@ -64,7 +62,6 @@ func (c *Client) GetAppNewsV1(appId int, options *GetAppNewsOptions) (*GetAppNew
 	}
 	res, err := c.sendRequest(req)
 	if err = json.NewDecoder(res.Body).Decode(&resp); err != nil {
-		log.Println(err)
 		return nil, err
 	}
 	defer func(Body io.ReadCloser) {

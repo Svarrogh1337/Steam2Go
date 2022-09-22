@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 )
 
@@ -16,8 +15,6 @@ func (c *Client) GetAppListV1() (*GetAppListResponseV1, error) {
 	req, err := http.NewRequest("GET",
 		fmt.Sprintf("%s/ISteamApps/GetAppList/v%d",
 			c.BaseURL, apiVersion), nil)
-	log.Printf("%s/ISteamApps/GetAppList/v%d",
-		c.BaseURL, apiVersion)
 	if err != nil {
 		return nil, err
 	}

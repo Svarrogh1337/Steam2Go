@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	BaseURLV1 = "https://api.steampowered.com"
+	BaseURL = "https://api.steampowered.com"
 )
 
 type Client struct {
@@ -17,7 +17,7 @@ type Client struct {
 
 func ApiClient(appKey string) *Client {
 	return &Client{
-		BaseURL: BaseURLV1,
+		BaseURL: BaseURL,
 		apiKey:  appKey,
 		HTTPClient: &http.Client{
 			Timeout: time.Minute,
