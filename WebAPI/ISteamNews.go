@@ -3,43 +3,17 @@ package Steam2Go
 import (
 	"encoding/json"
 	"fmt"
+	"io"
+	"log"
 	"net/http"
 	"time"
 )
 
-type GetAppNewsResponse struct {
-	Appnews AppNews `json:"appnews"`
-}
-
-type AppNews struct {
-	Appid     int         `json:"appid"`
-	Newsitems []NewsItems `json:"newsitems"`
-	Count     int         `json:"count"`
-}
-
-type NewsItems struct {
-	Gid           string   `json:"gid"`
-	Title         string   `json:"title"`
-	URL           string   `json:"url"`
-	IsExternalURL bool     `json:"is_external_url"`
-	Author        string   `json:"author"`
-	Contents      string   `json:"contents"`
-	Feedlabel     string   `json:"feedlabel"`
-	Date          int      `json:"date"`
-	Feedname      string   `json:"feedname"`
-	FeedType      int      `json:"feed_type"`
-	Appid         int      `json:"appid"`
-	Tags          []string `json:"tags,omitempty"`
-}
-type GetAppNewsOptions struct {
-	Maxlength int    `json:"Maxlength"`
-	Enddate   int64  `json:"Enddate"`
-	Count     int    `json:"count"`
-	Tags      string `json:"tags,omitempty"`
-}
-
-func (c *Client) GetAppNews(appId int, options *GetAppNewsOptions) (*GetAppNewsResponse, error) {
-	var fullResponse GetAppNewsResponse
+func (c *Client) GetAppNewsV2(appId int, options *GetAppNewsOptions) (*GetAppNewsResponseV2, error) {
+	const (
+		apiVersion = 2
+	)
+	resp := GetAppNewsResponseV2{}
 	maxlength := 20
 	enddate := time.Now().Unix()
 	count := 20
@@ -51,21 +25,50 @@ func (c *Client) GetAppNews(appId int, options *GetAppNewsOptions) (*GetAppNewsR
 		tags = options.Tags
 	}
 	req, err := http.NewRequest("GET",
-		fmt.Sprintf("%s/ISteamNews/GetNewsForApp/v2?appid=%d&maxlength=%d&enddate=%d&count=%d&tags=%s",
-			c.BaseURL, appId, maxlength, enddate, count, tags), nil)
+		fmt.Sprintf("%s/ISteamNews/GetNewsForApp/v%d?appid=%d&maxlength=%d&enddate=%d&count=%d&tags=%s",
+			c.BaseURL, apiVersion, appId, maxlength, enddate, count, tags), nil)
 	if err != nil {
 		return nil, err
 	}
-	res, err := c.HTTPClient.Do(req)
+	res, err := c.sendRequest(req)
+	if err = json.NewDecoder(res.Body).Decode(&resp); err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(res.Body)
+	return &resp, err
+}
+
+func (c *Client) GetAppNewsV1(appId int, options *GetAppNewsOptions) (*GetAppNewsResponseV1, error) {
+	const (
+		apiVersion = 1
+	)
+	resp := GetAppNewsResponseV1{}
+	maxlength := 20
+	enddate := time.Now().Unix()
+	count := 20
+	tags := ""
+	if options != nil {
+		maxlength = options.Maxlength
+		enddate = options.Enddate
+		count = options.Count
+		tags = options.Tags
+	}
+	req, err := http.NewRequest("GET",
+		fmt.Sprintf("%s/ISteamNews/GetNewsForApp/v%d?appid=%d&maxlength=%d&enddate=%d&count=%d&tags=%s",
+			c.BaseURL, apiVersion, appId, maxlength, enddate, count, tags), nil)
 	if err != nil {
 		return nil, err
 	}
-	defer res.Body.Close()
-	if res.StatusCode < http.StatusOK || res.StatusCode >= http.StatusBadRequest {
+	res, err := c.sendRequest(req)
+	if err = json.NewDecoder(res.Body).Decode(&resp); err != nil {
+		log.Println(err)
 		return nil, err
 	}
-	if err := json.NewDecoder(res.Body).Decode(&fullResponse); err != nil {
-		return nil, err
-	}
-	return &fullResponse, err
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(res.Body)
+	return &resp, err
 }

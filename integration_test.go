@@ -2,16 +2,16 @@ package Steam2Go
 
 import (
 	Steam2Go "github.com/Svarrogh1337/Steam2Go/WebAPI"
-	"log"
+	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 )
 
 var options = &Steam2Go.GetAppNewsOptions{
-	5,
-	time.Now().Unix(),
-	5,
-	"patchnotes",
+	Maxlength: 5,
+	Enddate:   time.Now().Unix(),
+	Count:     5,
+	Tags:      "patchnotes",
 }
 
 var options2 = &Steam2Go.GetAppNewsOptions{
@@ -20,14 +20,13 @@ var options2 = &Steam2Go.GetAppNewsOptions{
 }
 
 func TestApiClient(t *testing.T) {
-	c := Steam2Go.ApiClient("", 1)
-	data, _ := c.GetAppNews(730, nil)
-	log.Println(data.Appnews.Newsitems[5].Title)
-	data2, _ := c.GetAppNews(440, options)
-	log.Println(data2.Appnews.Newsitems[1].Title)
-	data3, _ := c.GetAppNews(440, options2)
-	if len(data3.Appnews.Newsitems) == options2.Count {
-		log.Println("pass")
-	}
-	log.Println(data3.Appnews.Newsitems[1].Title)
+	c := Steam2Go.ApiClient("")
+	data, err := c.GetAppNewsV2(730, options)
+	data2, err2 := c.GetAppNewsV1(730, options2)
+	assert.NotNil(t, data)
+	assert.NotNil(t, data2)
+	assert.Nil(t, err)
+	assert.Nil(t, err2)
+	assert.Equal(t, 730, data.Appnews.Newsitems[1].Appid)
+	assert.Equal(t, 730, data2.Appnews.Newsitems.Newsitem[1].Appid)
 }
