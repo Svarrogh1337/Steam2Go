@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strconv"
 )
 
 type GetAppNewsResponseV1 struct {
@@ -60,12 +59,6 @@ type NewsItemsV2 struct {
 	FeedType      int      `json:"feed_type"`
 	Appid         int      `json:"appid"`
 	Tags          []string `json:"tags,omitempty"`
-}
-
-func Maxlength(amount int) RequestParameter {
-	return func(o *requestParameters) {
-		o.urlParams.Set("maxlength", strconv.Itoa(amount))
-	}
 }
 
 func (c *Client) GetAppNewsV1(ctx context.Context, appid int, options ...RequestParameter) (*GetAppNewsResponseV1, error) {

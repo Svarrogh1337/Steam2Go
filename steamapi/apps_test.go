@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestAppsClient(t *testing.T) {
+func TestApps(t *testing.T) {
 	c := NewClient("")
 	appsv1, err := c.GetAppListV1(context.Background())
 	assert.NotNil(t, appsv1.Applist.Apps.App[0].Appid)

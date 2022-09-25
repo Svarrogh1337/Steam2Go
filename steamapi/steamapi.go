@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strconv"
 	"time"
 )
 
@@ -62,4 +63,16 @@ func getOptionalParameters(options ...RequestParameter) requestParameters {
 		opt(&o)
 	}
 	return o
+}
+
+func Maxlength(amount int) RequestParameter {
+	return func(o *requestParameters) {
+		o.urlParams.Set("maxlength", strconv.Itoa(amount))
+	}
+}
+
+func Count(amount int) RequestParameter {
+	return func(o *requestParameters) {
+		o.urlParams.Set("count", strconv.Itoa(amount))
+	}
 }
