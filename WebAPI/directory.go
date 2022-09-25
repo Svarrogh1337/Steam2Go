@@ -28,13 +28,6 @@ type ServerlistV1 struct {
 	WtdLoad        float64 `json:"wtd_load"`
 }
 
-type GetCMListForConnectOptions struct {
-	Cellid   int    `json:"cellid"`
-	Cmtype   string `json:"cmtype"`
-	Realm    string `json:"realm"`
-	Maxcount int    `json:"maxcount"`
-}
-
 func (c *Client) GetCMListForConnectV1(ctx context.Context, options ...RequestParameter) (*GetCMListForConnectResponseV1, error) {
 	const (
 		apiVersion = 1

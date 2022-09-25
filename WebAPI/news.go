@@ -62,13 +62,6 @@ type NewsItemsV2 struct {
 	Tags          []string `json:"tags,omitempty"`
 }
 
-type GetAppNewsOptions struct {
-	Maxlength int    `json:"maxlength,omitempty"`
-	Enddate   int64  `json:"enddate,omitempty"`
-	Count     int    `json:"count,omitempty"`
-	Tags      string `json:"tags,omitempty"`
-}
-
 func Maxlength(amount int) RequestParameter {
 	return func(o *requestParameters) {
 		o.urlParams.Set("maxlength", strconv.Itoa(amount))

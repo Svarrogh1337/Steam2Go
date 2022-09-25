@@ -9,16 +9,13 @@ import (
 )
 
 type GetFriendListResponseV1 struct {
-	Friendslist Friendslist `json:"friendslist"`
-}
-
-type Friendslist struct {
-	Friends []Friends `json:"friends"`
-}
-type Friends struct {
-	Steamid      string `json:"steamid"`
-	Relationship string `json:"relationship"`
-	FriendSince  int    `json:"friend_since"`
+	Friendslist struct {
+		Friends []struct {
+			Steamid      string `json:"steamid"`
+			Relationship string `json:"relationship"`
+			FriendSince  int    `json:"friend_since"`
+		} `json:"friends"`
+	} `json:"friendslist"`
 }
 
 func (c *Client) GetFriendListV1(ctx context.Context, steamid int, options ...RequestParameter) (*GetFriendListResponseV1, error) {
