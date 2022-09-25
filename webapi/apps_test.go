@@ -1,4 +1,4 @@
-package Steam2Go
+package webapi
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 )
 
 func TestAppsClient(t *testing.T) {
-	c := WebApiClient("")
+	c := NewClient("")
 	appsv1, err := c.GetAppListV1(context.Background())
 	assert.NotNil(t, appsv1.Applist.Apps.App[0].Appid)
 	assert.Nil(t, err)

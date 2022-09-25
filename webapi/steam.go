@@ -1,4 +1,4 @@
-package Steam2Go
+package webapi
 
 import (
 	"fmt"
@@ -24,7 +24,7 @@ type requestParameters struct {
 
 type RequestParameter func(*requestParameters)
 
-func WebApiClient(apiKey string) *Client {
+func NewClient(apiKey string) *Client {
 	return &Client{
 		baseURL: BaseURL,
 		apiKey:  apiKey,

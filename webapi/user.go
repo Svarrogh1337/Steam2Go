@@ -1,4 +1,4 @@
-package Steam2Go
+package webapi
 
 import (
 	"context"

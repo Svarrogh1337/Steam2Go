@@ -1,4 +1,4 @@
-package Steam2Go
+package webapi
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 )
 
 func TestApiClient(t *testing.T) {
-	c := WebApiClient("")
+	c := NewClient("")
 
 	newsV2, err := c.GetAppNewsV2(context.Background(), 730, Maxlength(5))
 	newsV1, err2 := c.GetAppNewsV1(context.Background(), 730)

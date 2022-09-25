@@ -1,1 +1,1 @@
-package Steam2Go
+package webapi
