@@ -1,4 +1,4 @@
-package webapi
+package steamapi
 
 import (
 	"context"
@@ -8,8 +8,7 @@ import (
 
 func TestApiClient(t *testing.T) {
 	c := NewClient("")
-
-	newsV2, err := c.GetAppNewsV2(context.Background(), 730, Maxlength(5))
+	newsV2, err := c.GetAppNewsV2(context.Background(), 730)
 	newsV1, err2 := c.GetAppNewsV1(context.Background(), 730)
 	frsV1, err5 := c.GetFriendListV1(context.Background(), 76561198068163231)
 	cmlist, err4 := c.GetCMListForConnectV1(context.Background())

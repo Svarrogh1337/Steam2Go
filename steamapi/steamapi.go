@@ -1,4 +1,6 @@
-package webapi
+// Package Steam2Go.steamapi provides low level bindings for the
+// Steamworks Web API interfaces .
+package steamapi
 
 import (
 	"fmt"
