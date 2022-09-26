@@ -2,10 +2,7 @@ package steamapi
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
 )
 
 type GetFriendListResponseV1 struct {
@@ -27,19 +24,6 @@ func (c *Client) GetFriendListV1(ctx context.Context, steamid int, options ...Re
 	if params := getOptionalParameters(options...).urlParams.Encode(); params != "" {
 		apiURL += "&" + params
 	}
-	req, err := http.NewRequestWithContext(ctx, "GET", apiURL, nil)
-	if err != nil {
-		return nil, err
-	}
-	res, err := c.sendRequest(req)
-	if err != nil {
-		return nil, err
-	}
-	if err = json.NewDecoder(res.Body).Decode(&resp); err != nil {
-		return nil, err
-	}
-	defer func(Body io.ReadCloser) {
-		_ = Body.Close()
-	}(res.Body)
+	err := c.get(ctx, apiURL, &resp)
 	return &resp, err
 }

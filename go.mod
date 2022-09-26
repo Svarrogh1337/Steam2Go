@@ -2,10 +2,7 @@ module github.com/Svarrogh1337/Steam2Go
 
 go 1.19
 
-require (
-	github.com/stretchr/testify v1.8.0
-	golang.org/x/net v0.0.0-20220923203811-8be639271d50
-)
+require github.com/stretchr/testify v1.8.0
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect

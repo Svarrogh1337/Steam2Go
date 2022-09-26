@@ -2,30 +2,23 @@ package steamapi
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
 )
 
 type GetCMListForConnectResponseV1 struct {
-	Response ResponseV1 `json:"response"`
-}
-
-type ResponseV1 struct {
-	Serverlist []ServerlistV1 `json:"serverlist"`
-	Success    bool           `json:"success"`
-	Message    string         `json:"message"`
-}
-
-type ServerlistV1 struct {
-	Endpoint       string  `json:"endpoint"`
-	LegacyEndpoint string  `json:"legacy_endpoint"`
-	Type           string  `json:"type"`
-	Dc             string  `json:"dc"`
-	Realm          string  `json:"realm"`
-	Load           int     `json:"load"`
-	WtdLoad        float64 `json:"wtd_load"`
+	Response struct {
+		Serverlist []struct {
+			Endpoint       string  `json:"endpoint"`
+			LegacyEndpoint string  `json:"legacy_endpoint"`
+			Type           string  `json:"type"`
+			Dc             string  `json:"dc"`
+			Realm          string  `json:"realm"`
+			Load           int     `json:"load"`
+			WtdLoad        float64 `json:"wtd_load"`
+		} `json:"serverlist"`
+		Success bool   `json:"success"`
+		Message string `json:"message"`
+	} `json:"response"`
 }
 
 func (c *Client) GetCMListForConnectV1(ctx context.Context, options ...RequestParameter) (*GetCMListForConnectResponseV1, error) {
@@ -37,16 +30,6 @@ func (c *Client) GetCMListForConnectV1(ctx context.Context, options ...RequestPa
 	if params := getOptionalParameters(options...).urlParams.Encode(); params != "" {
 		apiURL += "&" + params
 	}
-	req, err := http.NewRequestWithContext(ctx, "GET", apiURL, nil)
-	if err != nil {
-		return nil, err
-	}
-	res, err := c.sendRequest(req)
-	if err := json.NewDecoder(res.Body).Decode(&resp); err != nil {
-		return nil, err
-	}
-	defer func(Body io.ReadCloser) {
-		_ = Body.Close()
-	}(res.Body)
+	err := c.get(ctx, apiURL, &resp)
 	return &resp, err
 }

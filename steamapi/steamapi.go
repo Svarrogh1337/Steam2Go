@@ -1,8 +1,10 @@
-// Package Steam2Go.steamapi provides low level bindings for the
+// Package steamapi provides low level bindings for the
 // Steamworks Web API interfaces .
 package steamapi
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -36,23 +38,33 @@ func NewClient(apiKey string) *Client {
 		},
 	}
 }
-func (c *Client) sendRequest(req *http.Request) (*http.Response, error) {
+
+func (c *Client) get(ctx context.Context, apiURL string, v interface{}) error {
+	req, err := http.NewRequestWithContext(ctx, "GET", apiURL, nil)
+	if err != nil {
+		return err
+	}
 	res, err := c.http.Do(req)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	if res.StatusCode == http.StatusForbidden {
+
+	if res.StatusCode != http.StatusOK {
 		responseBody, err := io.ReadAll(res.Body)
 		if err != nil {
-			return nil, fmt.Errorf("Steam2Go: Unknown error %s", res.Status)
+			return fmt.Errorf("Steam2Go: Unknown error %s", res.Status)
 		}
-		return nil, fmt.Errorf("Steam2Go: Response %s: %s",
+		return fmt.Errorf("Steam2Go: Response %s: %s",
 			res.Status, string(responseBody))
 	}
-	if res.StatusCode != http.StatusOK {
-		return nil, err
+
+	if err = json.NewDecoder(res.Body).Decode(&v); err != nil {
+		return err
 	}
-	return res, nil
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(res.Body)
+	return nil
 }
 
 func getOptionalParameters(options ...RequestParameter) requestParameters {
@@ -71,8 +83,35 @@ func Maxlength(amount int) RequestParameter {
 	}
 }
 
-func Count(amount int) RequestParameter {
+func Maxcount(amount uint32) RequestParameter {
 	return func(o *requestParameters) {
-		o.urlParams.Set("count", strconv.Itoa(amount))
+		o.urlParams.Set("maxcount", strconv.FormatUint(uint64(amount), 10))
+	}
+}
+func Enddate(amount int64) RequestParameter {
+	return func(o *requestParameters) {
+		o.urlParams.Set("enddate", strconv.FormatUint(uint64(amount), 10))
+	}
+}
+func Count(amount uint32) RequestParameter {
+	return func(o *requestParameters) {
+		o.urlParams.Set("count", strconv.FormatUint(uint64(amount), 10))
+	}
+}
+func Cellid(amount uint32) RequestParameter {
+	return func(o *requestParameters) {
+		o.urlParams.Set("cellid", strconv.FormatUint(uint64(amount), 10))
+	}
+}
+
+// Avaialble only for ISteamNewsV2 API
+func Feeds(amount string) RequestParameter {
+	return func(o *requestParameters) {
+		o.urlParams.Set("feeds", amount)
+	}
+}
+func Tags(amount string) RequestParameter {
+	return func(o *requestParameters) {
+		o.urlParams.Set("Tags", amount)
 	}
 }

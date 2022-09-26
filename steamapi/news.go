@@ -2,10 +2,7 @@ package steamapi
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
 )
 
 type GetAppNewsResponseV1 struct {
@@ -70,17 +67,7 @@ func (c *Client) GetAppNewsV1(ctx context.Context, appid int, options ...Request
 	if params := getOptionalParameters(options...).urlParams.Encode(); params != "" {
 		apiURL += "&" + params
 	}
-	req, err := http.NewRequestWithContext(ctx, "GET", apiURL, nil)
-	if err != nil {
-		return nil, err
-	}
-	res, err := c.sendRequest(req)
-	if err = json.NewDecoder(res.Body).Decode(&resp); err != nil {
-		return nil, err
-	}
-	defer func(Body io.ReadCloser) {
-		_ = Body.Close()
-	}(res.Body)
+	err := c.get(ctx, apiURL, &resp)
 	return &resp, err
 }
 
@@ -93,16 +80,6 @@ func (c *Client) GetAppNewsV2(ctx context.Context, appid int, options ...Request
 	if params := getOptionalParameters(options...).urlParams.Encode(); params != "" {
 		apiURL += "&" + params
 	}
-	req, err := http.NewRequestWithContext(ctx, "GET", apiURL, nil)
-	if err != nil {
-		return nil, err
-	}
-	res, err := c.sendRequest(req)
-	if err = json.NewDecoder(res.Body).Decode(&resp); err != nil {
-		return nil, err
-	}
-	defer func(Body io.ReadCloser) {
-		_ = Body.Close()
-	}(res.Body)
+	err := c.get(ctx, apiURL, &resp)
 	return &resp, err
 }
