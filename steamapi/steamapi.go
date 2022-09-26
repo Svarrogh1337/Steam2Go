@@ -115,3 +115,9 @@ func Tags(amount string) RequestParameter {
 		o.urlParams.Set("Tags", amount)
 	}
 }
+
+func Relationship(amount string) RequestParameter {
+	return func(o *requestParameters) {
+		o.urlParams.Set("relationship", amount)
+	}
+}

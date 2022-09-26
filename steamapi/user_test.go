@@ -12,7 +12,7 @@ func TestUser(t *testing.T) {
 	key, _ := os.LookupEnv("apikey")
 	c := NewClient(key)
 	c2 := NewClient("")
-	userV1, err := c.GetFriendListV1(context.Background(), 76561198068163231)
+	userV1, err := c.GetFriendListV1(context.Background(), 76561198068163231, Relationship("friend"))
 	_, err2 := c2.GetFriendListV1(context.Background(), 76561198068163231)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Millisecond))
 	defer cancel()
