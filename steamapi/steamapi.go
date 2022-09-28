@@ -104,7 +104,7 @@ func Cellid(amount uint32) RequestParameter {
 	}
 }
 
-// Avaialble only for ISteamNewsV2 API
+// Available only for ISteamNewsV2 API
 func Feeds(amount string) RequestParameter {
 	return func(o *requestParameters) {
 		o.urlParams.Set("feeds", amount)
