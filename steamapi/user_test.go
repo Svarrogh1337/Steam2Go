@@ -31,4 +31,10 @@ func TestUser(t *testing.T) {
 	pb2, err5 := c.GetPlayerBansV1(context.Background(), steamids2)
 	assert.Empty(t, pb2.Players)
 	assert.Nil(t, err5)
+	sm, err6 := c.GetPlayerSummariesV1(context.Background(), steamids2)
+	assert.NotNil(t, sm.Response.Players.Player[0].Steamid)
+	assert.Nil(t, err6)
+	sm2, err6 := c.GetPlayerSummariesV2(context.Background(), steamids)
+	assert.NotNil(t, sm2.Response.Players[1].Steamid)
+	assert.Nil(t, err6)
 }

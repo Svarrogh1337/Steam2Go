@@ -400,7 +400,7 @@ func (c *Client) GetAppListV1(ctx context.Context) (*GetAppListResponseV1, error
 
 // GetAppListV2 gets the complete list of public apps.
 // This call has no additional parameters.
-// This method has previous versions which are no longer officially supported. They will continue to be usable, but it's highly recommended that you use the latest version.
+// This call has previous versions which are no longer officially supported. They will continue to be usable, but it's highly recommended that you use the latest version.
 // Change history:
 // Version 2 - Removed the redundant "app" field.
 // Response - GetAppListResponseV2
