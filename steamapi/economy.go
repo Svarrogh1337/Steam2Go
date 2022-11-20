@@ -154,16 +154,12 @@ func (c *Client) GetAssetPricesV1(ctx context.Context, appid int, options ...Req
 	return &resp, err
 }
 
-func (c *Client) GetAssetClassInfoV1(ctx context.Context, appid int, classid int, options ...RequestParameter) (*GetAssetClassInfoResponseV1, error) {
+func (c *Client) GetAssetClassInfoV1(ctx context.Context, appid int, classid int) (*GetAssetClassInfoResponseV1, error) {
 	const (
 		apiVersion = 1
 		method     = "GetAssetClassInfo"
 	)
 	apiURL := fmt.Sprintf("%s/%s/%s/v%d?key=%s&appid=%d&class_count=1&classid0=%d", c.baseURL, iface, method, apiVersion, c.apiKey, appid, classid)
-
-	if params := getOptionalParameters(options...).urlParams.Encode(); params != "" {
-		apiURL += "&" + params
-	}
 	raw := GetAssetClassInfoResponseRawV1{}
 	resp := GetAssetClassInfoResponseV1{}
 	err := c.get(ctx, apiURL, &raw)
