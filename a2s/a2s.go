@@ -9,6 +9,7 @@ type Client struct {
 	addr   string
 	port   int
 	conn   net.Conn
+	size   int
 	buffer []byte
 }
 
@@ -16,6 +17,7 @@ func NewClient(addr string, port int) (*Client, error) {
 	c := &Client{
 		addr: addr,
 		port: port,
+		size: 1400,
 	}
 	address := fmt.Sprintf("%s:%d", c.addr, c.port)
 	s, err := net.ResolveUDPAddr("udp4", address)
@@ -35,7 +37,7 @@ func (c *Client) send(data []byte) error {
 }
 
 func (c *Client) read() error {
-	c.buffer = make([]byte, 1400)
+	c.buffer = make([]byte, c.size)
 	size, err := c.conn.Read(c.buffer)
 	if size <= 0 {
 		return fmt.Errorf("Steam2Go A2S: Packet size 0")
