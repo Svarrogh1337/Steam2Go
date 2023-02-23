@@ -6,11 +6,15 @@ import (
 )
 
 type Client struct {
-	addr   string
-	port   int
-	conn   net.Conn
-	size   int
-	buffer []byte
+	addr string
+	port int
+	conn net.Conn
+	size int
+}
+
+type Request struct {
+	msg      []byte
+	response *Response
 }
 
 func NewClient(addr string, port int) (*Client, error) {
@@ -28,17 +32,19 @@ func NewClient(addr string, port int) (*Client, error) {
 	return c, nil
 }
 
-func (c *Client) send(data []byte) error {
-	_, err := c.conn.Write(data)
+func (c *Client) send(request *Request) error {
+	_, err := c.conn.Write(request.msg)
 	if err != nil {
 		return fmt.Errorf("Steam2Go A2S: Error %s", err)
 	}
 	return nil
 }
 
-func (c *Client) read() error {
-	c.buffer = make([]byte, c.size)
-	size, err := c.conn.Read(c.buffer)
+func (c *Client) read(request *Request) error {
+	request.response = &Response{
+		raw: make([]byte, c.size),
+	}
+	size, err := c.conn.Read(request.response.raw)
 	if size <= 0 {
 		return fmt.Errorf("Steam2Go A2S: Packet size 0")
 	}
@@ -46,4 +52,18 @@ func (c *Client) read() error {
 		return fmt.Errorf("Steam2Go A2S: Error %s", err)
 	}
 	return nil
+}
+func (c *Client) Do(request *Request) (*Response, error) {
+	err := c.send(request)
+	if err != nil {
+		return nil, err
+	}
+	err = c.read(request)
+	if err != nil {
+		return nil, err
+	}
+	if err != nil {
+		return nil, err
+	}
+	return request.response, nil
 }
