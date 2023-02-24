@@ -2,22 +2,20 @@ package a2s
 
 import (
 	"encoding/binary"
-	"log"
-)
-
-const (
-	theShip   = 2400
-	Challenge = 100
-	Info      = 200
-	Player    = 300
-	Rules     = 400
-	Ping      = 500
 )
 
 type Response struct {
 	raw      []byte
 	position int
+	t        uint8
 	decoded  interface{}
+	error    error
+}
+
+func (r *Response) readRawUint32() []byte {
+	v := r.raw[r.position : r.position+4]
+	r.position += 4
+	return v
 }
 
 func (r *Response) readUint64() uint64 {
@@ -63,28 +61,37 @@ func (r *Response) TheShipResponse() *TheShipResponse {
 	}
 }
 func (r *Response) EDFResponse(EDF byte) *EDFResponse {
-	response := &EDFResponse{}
+	res := &EDFResponse{}
 	switch EDF = r.readUint8(); EDF {
-	case 0x01:
-		response.GameID = r.readUint64()
-	case 0x10:
-		response.SteamID = r.readUint64()
-	case 0x20:
-		response.Keywords = r.readString()
-	case 0x40:
+	case gameID:
+		res.GameID = r.readUint64()
+	case steamID:
+		res.SteamID = r.readUint64()
+	case keywords:
+		res.Keywords = r.readString()
+	case sourceTV:
 		SourceTV := &SourceTVResponse{}
 		SourceTV.Port = r.readUint16()
 		SourceTV.Name = r.readString()
-		response.SourceTV = SourceTV
-	case 0x80:
-		response.Port = r.readUint16()
+		res.SourceTV = SourceTV
+	case port:
+		res.Port = r.readUint16()
 	}
-	return response
+	return res
 }
-func (r *Response) Decode() {
+func (r *Response) Decode() error {
+	switch r.t {
+	case response:
+		r.decoded = *r.decodeInfoResponse()
+	case player_request:
+
+	}
+
+	return r.error
+}
+func (r *Response) decodeInfoResponse() *InfoResponse {
 	var data InfoResponse
 	data.PacketHeader = r.readUint32()
-	log.Println(data.PacketHeader)
 	data.PayloadHeader = r.readUint8()
 	data.Protocol = r.readUint8()
 	data.Name = r.readString()
@@ -102,5 +109,10 @@ func (r *Response) Decode() {
 		data.TheShipResponse = r.TheShipResponse()
 	}
 	data.Version = r.readString()
-	r.decoded = data
+	return &data
+}
+
+func (r *Response) decodePlayerResponse() *InfoResponse {
+	var data InfoResponse
+	return &data
 }

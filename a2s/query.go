@@ -47,7 +47,18 @@ func RequestInfo() *Request {
 	msg.WriteString("Source Engine Query")
 	msg.WriteByte(0)
 	return &Request{
-		msg:      msg.Bytes(),
-		response: nil,
+		msg:         msg,
+		response:    nil,
+		requestType: 0x54,
+	}
+}
+
+func RequestPlayer() *Request {
+	var msg bytes.Buffer
+	msg.Write([]byte{0xFF, 0xFF, 0xFF, 0xFF, 0x55, 0xFF, 0xFF, 0xFF, 0xFF})
+	return &Request{
+		msg:         msg,
+		response:    nil,
+		requestType: 0x55,
 	}
 }
