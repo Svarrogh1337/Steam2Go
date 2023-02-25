@@ -2,7 +2,6 @@ package a2s
 
 import (
 	"encoding/binary"
-	"fmt"
 	"log"
 )
 
@@ -11,7 +10,6 @@ type Response struct {
 	position int
 	t        uint8
 	decoded  interface{}
-	error    error
 }
 
 type InfoResponse struct {
@@ -164,24 +162,18 @@ func (r *Response) EDFResponse(EDF byte) *EDFResponse {
 	return res
 }
 
-func (r *Response) Decode() error {
+func (r *Response) Decode() {
 	switch r.t {
 	case info:
-		data, err := r.decodeInfoResponse()
-		r.decoded = *data
-		r.error = err
+		r.decoded = *r.decodeInfoResponse()
 	case player:
-		data, err := r.decodePlayerResponse()
-		r.decoded = *data
-		r.error = err
+		r.decoded = *r.decodePlayerResponse()
 	case rules:
-		data, err := r.decodeRulesResponse()
-		r.decoded = *data
-		r.error = err
+		r.decoded = *r.decodeRulesResponse()
 	}
-	return r.error
 }
-func (r *Response) decodeInfoResponse() (*InfoResponse, error) {
+
+func (r *Response) decodeInfoResponse() *InfoResponse {
 	var data InfoResponse
 	data.PacketHeader = r.readUint32()
 	data.PayloadHeader = r.readUint8()
@@ -201,18 +193,17 @@ func (r *Response) decodeInfoResponse() (*InfoResponse, error) {
 		data.TheShipResponse = r.TheShipResponse()
 	}
 	data.Version = r.readString()
-	return &data, nil
+	return &data
 }
 
-func (r *Response) decodePlayerResponse() (*PlayerResponse, error) {
+func (r *Response) decodePlayerResponse() *PlayerResponse {
 	var data PlayerResponse
-	var err error
 	data.PacketHeader = r.readUint32()
 	data.PayloadHeader = r.readUint8()
 	data.PlayerCount = r.readUint8()
 	for i := 0; i <= int(data.PlayerCount); i++ {
 		if r.position == len(r.raw) {
-			err = fmt.Errorf("truncated response")
+			log.Printf("Steam2Go A2S: Truncated response. To recieve the full response increase the Client size.")
 			break
 		}
 		p := &Player{
@@ -223,27 +214,25 @@ func (r *Response) decodePlayerResponse() (*PlayerResponse, error) {
 		}
 		data.Players = append(data.Players, *p)
 	}
-	return &data, err
+	return &data
 }
 
-func (r *Response) decodeRulesResponse() (*RulesResponse, error) {
+func (r *Response) decodeRulesResponse() *RulesResponse {
 	var data RulesResponse
-	var err error
 	data.PacketHeader = r.readUint32()
 	data.PayloadHeader = r.readUint8()
 	data.RulesCount = r.readUint8()
 	log.Println(data.RulesCount)
 	for i := 0; i <= int(data.RulesCount); i++ {
 		if r.position == len(r.raw) {
-			err = fmt.Errorf("truncated response")
+			log.Printf("Steam2Go A2S: Truncated response. To recieve the full response increase the Client size.")
 			break
 		}
 		rule := &Rule{
 			Name:  r.readString(),
 			Value: r.readString(),
 		}
-		log.Println(i, rule)
 		data.Rules = append(data.Rules, *rule)
 	}
-	return &data, err
+	return &data
 }
