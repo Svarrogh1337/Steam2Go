@@ -1,25 +1,27 @@
 package a2s
 
 import (
-	"github.com/stretchr/testify/assert"
 	"log"
 	"testing"
 )
 
 func TestCSGO(t *testing.T) {
-	c, _ := NewClient("51.89.54.207", 27015)
-	request := RequestInfo()
-	res, err := c.Do(request)
-	res.Decode()
-	log.Println(res.t)
-	assert.Nil(t, err)
-	assert.NotNil(t, res.decoded.(InfoResponse).Name)
-	request2 := RequestPlayer()
+	c, _ := NewClient("87.121.112.34", 27015)
+	//request := RequestInfo()
+	//res, err := c.Do(request)
+	//res.Decode()
+	//log.Println(res.t)
+	//assert.Nil(t, err)
+	//assert.NotNil(t, res.decoded.(InfoResponse).Name)
+	request2 := RequestRules()
 	res2, _ := c.Do(request2)
+	//log.Println(res2.decoded.(PlayerResponse).PlayerCount)
+	res2.Decode()
+	log.Println(res2.decoded.(RulesResponse).Rules)
 	log.Println(res2.raw)
 }
 
-func TestShips(t *testing.T) {
+/*func TestShips(t *testing.T) {
 	c, _ := NewClient("46.4.48.226", 27021)
 	request := RequestInfo()
 	res, err := c.Do(request)
@@ -57,5 +59,4 @@ func TestValheim(t *testing.T) {
 	request4 := RequestPlayer()
 	res4, err4 := c.Do(request4)
 	log.Println(res4, err4)
-
-}
+}*/

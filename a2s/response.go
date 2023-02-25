@@ -2,6 +2,8 @@ package a2s
 
 import (
 	"encoding/binary"
+	"fmt"
+	"log"
 )
 
 type Response struct {
@@ -10,6 +12,81 @@ type Response struct {
 	t        uint8
 	decoded  interface{}
 	error    error
+}
+
+type InfoResponse struct {
+	PacketHeader    uint32
+	PayloadHeader   byte
+	Protocol        byte
+	Name            string
+	Map             string
+	Folder          string
+	Game            string
+	ID              uint16
+	Players         byte
+	MaxPlayers      byte
+	Bots            byte
+	ServerType      byte
+	Environment     byte
+	Visibility      byte
+	VAC             byte
+	TheShipResponse *TheShipResponse
+	Version         string
+	EDF             byte
+	EDFResponse     *EDFResponse
+}
+
+type TheShipResponse struct {
+	Mode      byte
+	Witnesses byte
+	Duration  byte
+}
+
+type EDFResponse struct {
+	Port     uint16
+	SteamID  uint64
+	SourceTV *SourceTVResponse
+	Keywords string
+	GameID   uint64
+}
+
+type SourceTVResponse struct {
+	Port uint16
+	Name string
+}
+type PlayerResponse struct {
+	PacketHeader   uint32
+	PayloadHeader  byte
+	PlayerCount    byte
+	Players        []Player
+	TheShipPlayers []TheShipPlayer
+}
+type Player struct {
+	Index    byte
+	Name     string
+	Score    uint32
+	Duration uint32
+}
+
+type TheShipPlayer struct {
+	Index    byte
+	Name     string
+	Score    uint32
+	Duration uint32
+	Deaths   uint32
+	Money    uint32
+}
+
+type RulesResponse struct {
+	PacketHeader  uint32
+	PayloadHeader byte
+	RulesCount    byte
+	Rules         []Rule
+}
+
+type Rule struct {
+	Name  string
+	Value string
 }
 
 func (r *Response) readRawUint32() []byte {
@@ -43,16 +120,22 @@ func (r *Response) readUint8() uint8 {
 }
 
 func (r *Response) readString() string {
+	log.Println(r.position)
 	start := r.position
 	for {
+		if r.position == 1400 {
+			return "Truncated response"
+		}
 		if r.raw[r.position] == 0 {
 			r.position++
 			break
 		}
 		r.position++
 	}
+
 	return string(r.raw[start : r.position-1])
 }
+
 func (r *Response) TheShipResponse() *TheShipResponse {
 	return &TheShipResponse{
 		Mode:      r.readUint8(),
@@ -60,6 +143,7 @@ func (r *Response) TheShipResponse() *TheShipResponse {
 		Duration:  r.readUint8(),
 	}
 }
+
 func (r *Response) EDFResponse(EDF byte) *EDFResponse {
 	res := &EDFResponse{}
 	switch EDF = r.readUint8(); EDF {
@@ -79,17 +163,25 @@ func (r *Response) EDFResponse(EDF byte) *EDFResponse {
 	}
 	return res
 }
+
 func (r *Response) Decode() error {
 	switch r.t {
-	case response:
-		r.decoded = *r.decodeInfoResponse()
-	case player_request:
-
+	case info:
+		data, err := r.decodeInfoResponse()
+		r.decoded = *data
+		r.error = err
+	case player:
+		data, err := r.decodePlayerResponse()
+		r.decoded = *data
+		r.error = err
+	case rules:
+		data, err := r.decodeRulesResponse()
+		r.decoded = *data
+		r.error = err
 	}
-
 	return r.error
 }
-func (r *Response) decodeInfoResponse() *InfoResponse {
+func (r *Response) decodeInfoResponse() (*InfoResponse, error) {
 	var data InfoResponse
 	data.PacketHeader = r.readUint32()
 	data.PayloadHeader = r.readUint8()
@@ -109,10 +201,49 @@ func (r *Response) decodeInfoResponse() *InfoResponse {
 		data.TheShipResponse = r.TheShipResponse()
 	}
 	data.Version = r.readString()
-	return &data
+	return &data, nil
 }
 
-func (r *Response) decodePlayerResponse() *InfoResponse {
-	var data InfoResponse
-	return &data
+func (r *Response) decodePlayerResponse() (*PlayerResponse, error) {
+	var data PlayerResponse
+	var err error
+	data.PacketHeader = r.readUint32()
+	data.PayloadHeader = r.readUint8()
+	data.PlayerCount = r.readUint8()
+	for i := 0; i <= int(data.PlayerCount); i++ {
+		if r.position == len(r.raw) {
+			err = fmt.Errorf("truncated response")
+			break
+		}
+		p := &Player{
+			Index:    r.readUint8(),
+			Name:     r.readString(),
+			Score:    r.readUint32(),
+			Duration: r.readUint32(),
+		}
+		data.Players = append(data.Players, *p)
+	}
+	return &data, err
+}
+
+func (r *Response) decodeRulesResponse() (*RulesResponse, error) {
+	var data RulesResponse
+	var err error
+	data.PacketHeader = r.readUint32()
+	data.PayloadHeader = r.readUint8()
+	data.RulesCount = r.readUint8()
+	log.Println(data.RulesCount)
+	for i := 0; i <= int(data.RulesCount); i++ {
+		if r.position == len(r.raw) {
+			err = fmt.Errorf("truncated response")
+			break
+		}
+		rule := &Rule{
+			Name:  r.readString(),
+			Value: r.readString(),
+		}
+		log.Println(i, rule)
+		data.Rules = append(data.Rules, *rule)
+	}
+	return &data, err
 }

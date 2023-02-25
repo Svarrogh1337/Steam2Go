@@ -7,19 +7,21 @@ import (
 )
 
 const (
-	gameID         = 0x01
-	steamID        = 0x10
-	keywords       = 0x20
-	sourceTV       = 0x40
-	challenge      = 0x41
-	player         = 0x44
-	response       = 0x49
-	player_request = 0x55
-	info_request   = 0x54
-	port           = 0x80
-	non_split      = 0xFFFFFFFF
-	split          = 0xFFFFFFFE
-	theShip        = 2400
+	nonSplit      = 0xFFFFFFFF
+	split         = 0xFFFFFFFE
+	gameID        = 0x01
+	steamID       = 0x10
+	keywords      = 0x20
+	sourceTV      = 0x40
+	challenge     = 0x41
+	player        = 0x44
+	rules         = 0x45
+	info          = 0x49
+	infoRequest   = 0x54
+	playerRequest = 0x55
+	rulesRequest  = 0x56
+	port          = 0x80
+	theShip       = 2400
 )
 
 type Client struct {
@@ -53,7 +55,7 @@ func NewClient(addr string, port int) (*Client, error) {
 
 func (c *Client) send(request *Request) error {
 	if c.challenge != nil {
-		if request.requestType == player_request {
+		if request.requestType == playerRequest || request.requestType == rulesRequest {
 			request.msg.Truncate(5)
 		}
 		request.msg.Write(c.challenge)
@@ -71,7 +73,7 @@ func (c *Client) read(request *Request) error {
 	}
 	size, err := c.conn.Read(request.response.raw)
 	switch PacketHeader := request.response.readUint32(); PacketHeader {
-	case non_split:
+	case nonSplit:
 	case split:
 	}
 	switch request.response.t = request.response.readUint8(); request.response.t {
