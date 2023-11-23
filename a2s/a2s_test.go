@@ -39,4 +39,5 @@ func TestShips(t *testing.T) {
 	res, err := c.Do(reqPlayer)
 	assert.Nil(t, err)
 	res.Decode()
+	assert.NotNil(t, res.decoded.(PlayerResponse).PlayerCount)
 }

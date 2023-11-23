@@ -197,12 +197,10 @@ func (r *Response) decodePlayerResponse() *PlayerResponse {
 	data.PayloadHeader = r.readUint8()
 	data.PlayerCount = r.readUint8()
 	for i := 0; i <= int(data.PlayerCount); i++ {
-		log.Println(r.position)
 		if r.position == len(r.raw) {
 			log.Printf("Steam2Go A2S: Truncated response. To recieve the full response increase the Client size.")
 			break
 		}
-		log.Printf("Start of  player %d", r.position)
 		p := &Player{
 			Index:    r.readUint8(),
 			Name:     r.readString(),
@@ -217,7 +215,6 @@ func (r *Response) decodePlayerResponse() *PlayerResponse {
 		data.Players = append(data.Players, *p)
 
 	}
-	log.Println(r.raw)
 	return &data
 }
 
@@ -226,7 +223,6 @@ func (r *Response) decodeRulesResponse() *RulesResponse {
 	data.PacketHeader = r.readUint32()
 	data.PayloadHeader = r.readUint8()
 	data.RulesCount = r.readUint8()
-	log.Println(data.RulesCount)
 	for i := 0; i <= int(data.RulesCount); i++ {
 		if r.position == len(r.raw) {
 			log.Printf("Steam2Go A2S: Truncated response. To recieve the full response increase the Client size.")
