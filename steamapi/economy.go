@@ -136,12 +136,9 @@ type Tag struct {
 	Num2 Num12 `json:"2,omitempty"`
 }
 
-const (
-	iface = "ISteamEconomy"
-)
-
 func (c *Client) GetAssetPricesV1(ctx context.Context, appid int, options ...RequestParameter) (*GetAssetPricesResponseV1, error) {
 	const (
+		iface      = "ISteamEconomy"
 		apiVersion = 1
 		method     = "GetAssetPrices"
 	)
@@ -156,6 +153,7 @@ func (c *Client) GetAssetPricesV1(ctx context.Context, appid int, options ...Req
 
 func (c *Client) GetAssetClassInfoV1(ctx context.Context, appid int, classid int) (*GetAssetClassInfoResponseV1, error) {
 	const (
+		iface      = "ISteamEconomy"
 		apiVersion = 1
 		method     = "GetAssetClassInfo"
 	)
