@@ -14,5 +14,5 @@ If you have access to such key and want to contribute to the project, don't hesi
 | Features      | Package  | Progress |
 |---------------|----------|----------|
 | Steam Web Api | steamapi | 15%      |
+| A2S           | A2S      | 100%     |
 | rcon          | rcon     | 0%       |
-
