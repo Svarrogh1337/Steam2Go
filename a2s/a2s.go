@@ -81,7 +81,7 @@ func (c *Client) read(request *Request) error {
 		c.challenge = request.response.readRawUint32()
 		c.do(request)
 	}
-	request.response.position = 0
+
 	if size <= 0 {
 		return fmt.Errorf("Steam2Go A2S: Packet size 0")
 	}
@@ -103,5 +103,6 @@ func (c *Client) do(request *Request) (*Response, error) {
 	if err != nil {
 		return nil, err
 	}
+	request.response.position = 0
 	return request.response, nil
 }

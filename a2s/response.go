@@ -53,26 +53,22 @@ type SourceTVResponse struct {
 	Name string
 }
 type PlayerResponse struct {
-	PacketHeader   uint32
-	PayloadHeader  byte
-	PlayerCount    byte
-	Players        []Player
-	TheShipPlayers []TheShipPlayer
+	PacketHeader  uint32
+	PayloadHeader byte
+	PlayerCount   byte
+	Players       []Player
 }
 type Player struct {
-	Index    byte
-	Name     string
-	Score    uint32
-	Duration uint32
+	Index          byte
+	Name           string
+	Score          uint32
+	Duration       uint32
+	TheShipPlayers TheShipPlayer
 }
 
 type TheShipPlayer struct {
-	Index    byte
-	Name     string
-	Score    uint32
-	Duration uint32
-	Deaths   uint32
-	Money    uint32
+	Deaths uint32
+	Money  uint32
 }
 
 type RulesResponse struct {
@@ -118,13 +114,12 @@ func (r *Response) readUint8() uint8 {
 }
 
 func (r *Response) readString() string {
-	log.Println(r.position)
 	start := r.position
 	for {
 		if r.position == 1400 {
-			return "Truncated response"
+			return "Truncated response. Increase the Client size to receive the full response."
 		}
-		if r.raw[r.position] == 0 {
+		if r.raw[r.position] == 0x00 {
 			r.position++
 			break
 		}
@@ -202,18 +197,27 @@ func (r *Response) decodePlayerResponse() *PlayerResponse {
 	data.PayloadHeader = r.readUint8()
 	data.PlayerCount = r.readUint8()
 	for i := 0; i <= int(data.PlayerCount); i++ {
+		log.Println(r.position)
 		if r.position == len(r.raw) {
 			log.Printf("Steam2Go A2S: Truncated response. To recieve the full response increase the Client size.")
 			break
 		}
+		log.Printf("Start of  player %d", r.position)
 		p := &Player{
 			Index:    r.readUint8(),
 			Name:     r.readString(),
 			Score:    r.readUint32(),
 			Duration: r.readUint32(),
 		}
+		s := &TheShipPlayer{
+			Deaths: r.readUint32(),
+			Money:  r.readUint32(),
+		}
+		p.TheShipPlayers = *s
 		data.Players = append(data.Players, *p)
+
 	}
+	log.Println(r.raw)
 	return &data
 }
 
